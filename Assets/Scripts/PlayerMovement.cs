@@ -33,12 +33,13 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("isRunning", false);
         }
 
-        if (mx > 0.05f)
+        Vector3 mouseDirection = getMouseDirection();
+        if (mouseDirection.x >= 0f)
         {
             playerGraphics.localScale = new Vector3(1f, 1f, 1f);
             isFacingRight = true;
         }
-        else if (mx < 0f)
+        else if (mouseDirection.x < 0f)
         {
             playerGraphics.localScale = new Vector3(-1f, 1f, 1f);
             isFacingRight = false;
@@ -56,13 +57,20 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
-        Vector3 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - gameObject.GetComponent<Transform>().position;
+        Vector3 difference = getMouseDirection();
 
-        difference.Set(difference.x, difference.y, 0f);
-        difference.Normalize();
-        difference *= jumpForce;
-
-        rb.velocity = new Vector2(difference.x, difference.y);
+        if (IsGround())
+        {
+            difference *= jumpForce;
+            rb.velocity = new Vector2(difference.x, difference.y);
+        }
+        else
+        {
+            difference *= (1.5f * jumpForce);
+            Vector2 newVel = new Vector2(rb.velocity.x + difference.x, rb.velocity.y + difference.y);
+            newVel = Vector2.ClampMagnitude(newVel, 1.1f * jumpForce);
+            rb.velocity = newVel;
+        }
         airJumps--;
     }
 
@@ -78,5 +86,14 @@ public class PlayerMovement : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    Vector3 getMouseDirection()
+    {
+        Vector3 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - gameObject.GetComponent<Transform>().position;
+
+        difference.Set(difference.x, difference.y, 0f);
+        difference.Normalize();
+        return difference;
     }
 }
