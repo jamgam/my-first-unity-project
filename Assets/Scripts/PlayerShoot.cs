@@ -2,30 +2,30 @@
 
 public class PlayerShoot : MonoBehaviour
 {
-  public float fireRate = 0.2f;
-  public Transform firingPoint;
-  public GameObject bulletPrefab;
-  float timeUntilFire;
-  PlayerMovement pm;
-  // Start is called before the first frame update
-  void Start()
-  {
-    pm = gameObject.GetComponent<PlayerMovement>();
-  }
-
-  // Update is called once per frame
-  void Update()
-  {
-    if (Input.GetMouseButtonDown(0) && timeUntilFire < Time.time)
+    public float fireRate = 0.2f;
+    public Transform firingPoint;
+    public GameObject bulletPrefab;
+    float timeUntilFire;
+    PlayerMovement pm;
+    // Start is called before the first frame update
+    void Start()
     {
-      Shoot();
-      timeUntilFire = Time.time + fireRate;
+        pm = gameObject.GetComponent<PlayerMovement>();
     }
-  }
 
-  void Shoot()
-  {
-    float angle = pm.isFacingRight ? 0f : 180f;
-    Instantiate(bulletPrefab, firingPoint.position, Quaternion.Euler(new Vector3(0f, 0f, angle)));
-  }
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0) && timeUntilFire < Time.time)
+        {
+            Shoot();
+            timeUntilFire = Time.time + fireRate;
+        }
+    }
+
+    void Shoot()
+    {
+        float angle = pm.isFacingRight ? 0f : 180f;
+        Instantiate(bulletPrefab, firingPoint.position, Quaternion.Euler(new Vector3(0f, 0f, angle)));
+    }
 }

@@ -2,75 +2,77 @@
 
 public class PlayerMovement : MonoBehaviour
 {
-  public float movementSpeed;
-  public Rigidbody2D rb;
+    public float movementSpeed;
+    public Rigidbody2D rb;
 
-  public float jumpForce = 20f;
-  public Transform feet;
-  public LayerMask groundLayers;
+    public float jumpForce = 20f;
+    public Transform feet;
+    public LayerMask groundLayers;
 
-  public Animator anim;
+    public Animator anim;
 
-  [HideInInspector] public bool isFacingRight = true;
+    public Transform playerGraphics;
 
-  float mx;
+    [HideInInspector] public bool isFacingRight = true;
 
-  // Update is called once per frame
-  void Update()
-  {
-    mx = Input.GetAxisRaw("Horizontal");
+    float mx;
 
-    if (Input.GetButtonDown("Jump") && IsGround())
+    // Update is called once per frame
+    void Update()
     {
-      Jump();
+        mx = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetButtonDown("Jump") && IsGround())
+        {
+            Jump();
+        }
+
+        if (Mathf.Abs(mx) > 0.05f)
+        {
+            anim.SetBool("isRunning", true);
+        }
+        else
+        {
+            anim.SetBool("isRunning", false);
+        }
+
+        if (mx > 0.05f)
+        {
+            playerGraphics.localScale = new Vector3(1f, 1f, 1f);
+            isFacingRight = true;
+        }
+        else if (mx < 0f)
+        {
+            playerGraphics.localScale = new Vector3(-1f, 1f, 1f);
+            isFacingRight = false;
+        }
+
+        anim.SetBool("isGrounded", IsGround());
     }
 
-    if (Mathf.Abs(mx) > 0.05f)
+    void FixedUpdate()
     {
-      anim.SetBool("isRunning", true);
-    }
-    else
-    {
-      anim.SetBool("isRunning", false);
+        Vector2 movement = new Vector2(mx * movementSpeed, rb.velocity.y);
+
+        rb.velocity = movement;
     }
 
-    if (mx > 0.05f)
+    void Jump()
     {
-      transform.localScale = new Vector3(1f, 1f, 1f);
-      isFacingRight = true;
-    }
-    else if (mx < 0f)
-    {
-      transform.localScale = new Vector3(-1f, 1f, 1f);
-      isFacingRight = false;
+        Vector2 movement = new Vector2(rb.velocity.x, jumpForce);
+
+        rb.velocity = movement;
     }
 
-    anim.SetBool("isGrounded", IsGround());
-  }
-
-  void FixedUpdate()
-  {
-    Vector2 movement = new Vector2(mx * movementSpeed, rb.velocity.y);
-
-    rb.velocity = movement;
-  }
-
-  void Jump()
-  {
-    Vector2 movement = new Vector2(rb.velocity.x, jumpForce);
-
-    rb.velocity = movement;
-  }
-
-  public bool IsGround()
-  {
-    Collider2D groundCheck = Physics2D.OverlapCircle(feet.position, 0.5f, groundLayers);
-
-    if (groundCheck != null)
+    public bool IsGround()
     {
-      return true;
-    }
-    return false;
+        Collider2D groundCheck = Physics2D.OverlapCircle(feet.position, 0.2f, groundLayers);
 
-  }
+        if (groundCheck != null)
+        {
+            return true;
+        }
+        return false;
+
+    }
 }
